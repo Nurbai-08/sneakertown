@@ -13,6 +13,9 @@ const navItems = [
   { to: '/cart', label: 'Корзина' },
 ];
 
+const profileLinkClass =
+  'btn-secondary inline-flex h-10 w-10 shrink-0 items-center justify-center gap-2 p-0 sm:w-auto sm:max-w-[9rem] sm:px-3';
+
 const linkClass = ({ isActive }) =>
   `text-sm font-semibold transition ${isActive ? 'text-accent' : 'text-neutral-600 hover:text-neutral-950 dark:text-neutral-300 dark:hover:text-white'}`;
 
@@ -24,6 +27,7 @@ export const Header = () => {
   const totalItems = useSelector((state) => state.cart.totalItems);
   const favoritesCount = useSelector((state) => state.favorites.favorites.length);
   const user = useSelector((state) => state.auth.user);
+  const isLoggedIn = Boolean(user?.uid);
 
   const handleSearch = useCallback(
     (query) => {
@@ -35,8 +39,8 @@ export const Header = () => {
 
   return (
     <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white/90 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/90">
-      <div className="container-page flex h-16 items-center gap-4">
-        <NavLink to="/" className="text-xl font-black tracking-normal">
+      <div className="container-page flex h-16 min-w-0 items-center gap-2 sm:gap-4">
+        <NavLink to="/" className="shrink-0 text-lg font-black tracking-normal sm:text-xl">
           Sneaker<span className="text-accent">Town</span>
         </NavLink>
 
@@ -52,30 +56,33 @@ export const Header = () => {
           <SearchBar onChange={handleSearch} placeholder="Найти модель или бренд" />
         </div>
 
-        <div className="ml-auto flex items-center gap-1 md:ml-0">
-          <button className="btn-secondary h-10 w-10 p-0" type="button" aria-label="Поиск" onClick={() => navigate('/catalog')}>
+        <div className="ml-auto flex min-w-0 shrink-0 items-center gap-0.5 sm:gap-1 md:ml-0">
+          <button className="btn-secondary h-10 w-10 shrink-0 p-0" type="button" aria-label="Поиск" onClick={() => navigate('/catalog')}>
             <FiSearch />
           </button>
-          <button className="btn-secondary h-10 w-10 p-0" type="button" aria-label="Тема" onClick={toggleTheme}>
+          <button className="btn-secondary h-10 w-10 shrink-0 p-0" type="button" aria-label="Тема" onClick={toggleTheme}>
             {theme === 'dark' ? <FiSun /> : <FiMoon />}
           </button>
-          <NavLink className="btn-secondary relative h-10 w-10 p-0" to="/favorites" aria-label="Избранное">
+          <NavLink className="btn-secondary relative h-10 w-10 shrink-0 p-0" to="/favorites" aria-label="Избранное">
             <FiHeart />
             {favoritesCount > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-accent px-1 text-xs text-white">{favoritesCount}</span>}
           </NavLink>
-          <NavLink className="btn-secondary relative h-10 w-10 p-0" to="/cart" aria-label="Корзина">
+          <NavLink className="btn-secondary relative h-10 w-10 shrink-0 p-0" to="/cart" aria-label="Корзина">
             <FiShoppingBag />
             {totalItems > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-accent px-1 text-xs text-white">{totalItems}</span>}
           </NavLink>
           <NavLink
-            className={user?.displayName ? 'btn-secondary hidden h-10 max-w-[140px] items-center gap-2 px-3 sm:inline-flex' : 'btn-secondary h-10 w-10 p-0'}
-            to={user ? '/profile' : '/login'}
+            className={profileLinkClass}
+            to={isLoggedIn ? '/profile' : '/login'}
             aria-label="Профиль"
+            title={user?.displayName || (isLoggedIn ? 'Профиль' : 'Войти')}
           >
-            <FiUser />
-            {user?.displayName ? <span className="truncate text-sm font-semibold">{user.displayName}</span> : null}
+            <FiUser className="shrink-0" />
+            {user?.displayName ? (
+              <span className="hidden truncate text-sm font-semibold sm:inline">{user.displayName}</span>
+            ) : null}
           </NavLink>
-          <button className="btn-secondary h-10 w-10 p-0 lg:hidden" type="button" aria-label="Меню" onClick={() => setOpen((value) => !value)}>
+          <button className="btn-secondary h-10 w-10 shrink-0 p-0 lg:hidden" type="button" aria-label="Меню" onClick={() => setOpen((value) => !value)}>
             {open ? <FiX /> : <FiMenu />}
           </button>
         </div>
@@ -86,12 +93,31 @@ export const Header = () => {
           <div className="container-page flex flex-col gap-4 px-0">
             <SearchBar onChange={handleSearch} />
             <nav className="grid gap-3">
+              <NavLink
+                to={isLoggedIn ? '/profile' : '/login'}
+                className={linkClass}
+                onClick={() => setOpen(false)}
+              >
+                <span className="inline-flex items-center gap-2">
+                  <FiUser />
+                  {isLoggedIn ? user?.displayName || 'Профиль' : 'Войти'}
+                </span>
+              </NavLink>
               {navItems.map((item) => (
                 <NavLink key={item.to} to={item.to} className={linkClass} onClick={() => setOpen(false)}>
                   {item.label}
                 </NavLink>
               ))}
             </nav>
+            <button
+              className="btn-secondary inline-flex w-full items-center justify-center gap-2 sm:hidden"
+              type="button"
+              aria-label="Тема"
+              onClick={toggleTheme}
+            >
+              {theme === 'dark' ? <FiSun /> : <FiMoon />}
+              {theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+            </button>
           </div>
         </div>
       )}

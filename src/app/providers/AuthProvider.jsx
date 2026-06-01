@@ -41,17 +41,19 @@ export const AuthProvider = ({ children }) => {
     }
     return onAuthStateChanged(auth, (firebaseUser) => {
       const activeUser = auth.currentUser ?? firebaseUser;
-      const mappedUser = mapFirebaseUser(activeUser);
 
-      dispatch(setUser(mappedUser));
-      dispatch(setAuthReady(true));
-
-      if (!firebaseUser) {
+      if (!activeUser) {
+        dispatch(setUser(null));
+        dispatch(setAuthReady(true));
         hydratedUid.current = null;
         return;
       }
 
-      const uid = firebaseUser.uid;
+      const mappedUser = mapFirebaseUser(activeUser);
+      dispatch(setUser(mappedUser));
+      dispatch(setAuthReady(true));
+
+      const uid = activeUser.uid;
 
       void (async () => {
         try {

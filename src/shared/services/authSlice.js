@@ -9,7 +9,7 @@ import {
 } from 'firebase/auth';
 import { auth, googleProvider, isFirebaseEnabled } from './firebase.js';
 import { userDataService } from './userDataService.js';
-import { mapFirebaseUser } from '../../entities/user/model.js';
+import { mapFirebaseUser, mergeAuthUser } from '../../entities/user/model.js';
 
 const requireFirebase = () => {
   if (!isFirebaseEnabled) {
@@ -23,15 +23,17 @@ export const registerUser = createAsyncThunk('auth/registerUser', async ({ email
     const { user } = await createUserWithEmailAndPassword(auth, email, password);
     const name = displayName?.trim() || '';
 
+    if (name) {
+      await updateProfile(user, { displayName: name });
+    }
+
+    const currentUser = auth.currentUser ?? user;
     const mappedUser = {
-      ...mapFirebaseUser(user),
-      displayName: name,
+      ...mapFirebaseUser(currentUser),
+      displayName: name || currentUser.displayName || '',
     };
 
-    if (name) {
-      updateProfile(user, { displayName: name }).catch(() => {});
-    }
-    userDataService.upsertUser({ ...user, displayName: name }).catch(() => {});
+    userDataService.upsertUser({ ...currentUser, displayName: mappedUser.displayName }).catch(() => {});
 
     return mappedUser;
   } catch (error) {
@@ -91,8 +93,8 @@ const authSlice = createSlice({
   },
   reducers: {
     setUser(state, action) {
-      state.user = action.payload;
-      state.isAuthenticated = Boolean(action.payload);
+      state.user = mergeAuthUser(state.user, action.payload);
+      state.isAuthenticated = Boolean(state.user);
       state.loading = false;
     },
     setAuthReady(state, action) {
@@ -111,7 +113,7 @@ const authSlice = createSlice({
       .addMatcher((action) => action.type.startsWith('auth/') && action.type.endsWith('/fulfilled'), (state, action) => {
         state.loading = false;
         if (action.payload && action.type !== 'auth/resetPassword/fulfilled') {
-          state.user = action.payload;
+          state.user = mergeAuthUser(state.user, action.payload);
           state.isAuthenticated = true;
         }
         if (action.type === 'auth/logoutUser/fulfilled') {

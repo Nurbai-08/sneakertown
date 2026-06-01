@@ -23,6 +23,12 @@ export default function ProfilePage() {
     setDisplayName(user?.displayName || '');
   }, [user?.displayName]);
 
+  useEffect(() => {
+    if (!user && auth?.currentUser) {
+      dispatch(setUser(mapFirebaseUser(auth.currentUser)));
+    }
+  }, [user, dispatch]);
+
   if (!authReady) {
     return (
       <PageLayout>
@@ -31,7 +37,16 @@ export default function ProfilePage() {
     );
   }
 
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) {
+    if (auth?.currentUser) {
+      return (
+        <PageLayout>
+          <PageLoader />
+        </PageLayout>
+      );
+    }
+    return <Navigate to="/login" replace />;
+  }
 
   const saveName = async () => {
     if (!auth?.currentUser) return showToast('Firebase не настроен');
