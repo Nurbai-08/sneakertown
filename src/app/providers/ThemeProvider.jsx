@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { storage } from '../../shared/utils/storage.js';
 

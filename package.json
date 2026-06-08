@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
+     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
     "lint": "eslint ."
@@ -13,6 +13,9 @@
     "@reduxjs/toolkit": "^2.5.0",
     "@vitejs/plugin-react": "^4.3.4",
     "axios": "^1.7.9",
+    "concurrently": "^9.1.2",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
     "firebase": "^11.10.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

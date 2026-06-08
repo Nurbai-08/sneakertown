@@ -1,1 +1,0 @@
-const e=r=>{const t=Number(r||0);return new Intl.NumberFormat("ru-RU",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(t)},n=r=>{if(!r)return"Не указана";const t=new Date(r);return Number.isNaN(t.getTime())?r:new Intl.DateTimeFormat("ru-RU",{day:"2-digit",month:"long",year:"numeric"}).format(t)};export{n as a,e as f};

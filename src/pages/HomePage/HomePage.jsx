@@ -6,13 +6,13 @@ import { HeroBanner } from '../../widgets/HeroBanner/HeroBanner.jsx';
 import { ProductGrid } from '../../widgets/ProductGrid/ProductGrid.jsx';
 import { getSneakers } from '../../features/sneakers/sneakersSlice.js';
 
-const brands = ['Nike', 'Adidas', 'Jordan', 'New Balance', 'Vans', 'Puma'];
+const brands = ['Nike', 'Adidas', 'Jordan', 'New Balance', 'On Cloud', 'Onitsuka', 'Golden Goose', 'The North Face', 'Timberland Boots', 'Birkenstock', 'Salomon', 'Zegna' ];
 
 export default function HomePage() {
   const dispatch = useDispatch();
   const { sneakers, loading } = useSelector((state) => state.sneakers);
-  const popular = useMemo(() => sneakers.slice(0, 4), [sneakers]);
-  const newest = useMemo(() => sneakers.slice(4, 8), [sneakers]);
+  const newest = useMemo(() => sneakers.slice(0, 4), [sneakers]);
+  const popular = useMemo(() => sneakers.slice(4, 8), [sneakers]);
 
   useEffect(() => {
     if (!sneakers.length) dispatch(getSneakers());
@@ -36,9 +36,9 @@ export default function HomePage() {
           <p className="text-2xl font-bold uppercase text-accent">Бренды</p>
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {brands.map((brand) => (
-              <Link key={brand} to={`/catalog`} className="rounded-md border border-neutral-200 bg-white p-5 text-center text-lg font-black transition hover:border-accent hover:text-accent dark:border-neutral-800 dark:bg-neutral-950">
+              <div key={brand} className="rounded-md border border-neutral-200 bg-white p-5 text-center text-lg font-black transition dark:border-neutral-800 dark:bg-neutral-950">
                 {brand}
-              </Link>
+              </div>
             ))}
           </div>
         </div>

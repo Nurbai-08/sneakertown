@@ -1,10 +1,9 @@
 export const formatPrice = (value) => {
   const amount = Number(value || 0);
   return new Intl.NumberFormat('ru-RU', {
-    style: 'currency',
-    currency: 'USD',
+    style: 'decimal',
     maximumFractionDigits: 0,
-  }).format(amount);
+  }).format(amount) + ' Сом';
 };
 
 export const formatDate = (value) => {

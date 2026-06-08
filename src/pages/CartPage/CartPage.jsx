@@ -10,6 +10,18 @@ export default function CartPage() {
   const dispatch = useDispatch();
   const { items, totalItems, totalPrice } = useSelector((state) => state.cart);
 
+
+  const handleCheckout = () => {
+    dispatch(clearCart());
+
+    setTimeout(() => {
+      alert('«Заказ успешно оформлен!»');
+      
+      window.location.href = '/';
+    }, 100);
+  };
+ 
+
   return (
     <PageLayout>
       <section className="container-page py-10">
@@ -49,7 +61,7 @@ export default function CartPage() {
               <h2 className="text-xl font-black">Итого</h2>
               <div className="mt-4 flex justify-between text-sm"><span>Товары</span><b>{totalItems}</b></div>
               <div className="mt-3 flex justify-between text-lg"><span>Сумма</span><b>{formatPrice(totalPrice)}</b></div>
-              <button className="btn-primary mt-6 w-full" type="button">Оформить заказ</button>
+              <button className="btn-primary mt-6 w-full" type="button" onClick={handleCheckout}>Оформить заказ</button>
             </aside>
           </div>
         )}
@@ -57,3 +69,5 @@ export default function CartPage() {
     </PageLayout>
   );
 }
+       
+
