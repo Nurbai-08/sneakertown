@@ -1,4 +1,4 @@
-export const BRANDS = ['nike', 'adidas', 'jordan', 'new balance', 'on cloud', 'golden goose', 'onitsuka', 'salomon', 'the-north-face', 'timberland', 'birkenstock', 'zegna'];
+export const BRANDS = ['nike', 'adidas', 'jordan', 'new balance', 'on cloud', 'golden goose', 'onitsuka', 'salomon', 'the-north-face', 'timberland', 'ugg', 'zegna', 'louis vuitton'];
 
 export const SORT_OPTIONS = [
   { value: 'retailPrice:asc', label: 'Цена по возрастанию' },
