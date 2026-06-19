@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { PageLayout } from '../layout/PageLayout.jsx';
 import { ProductGrid } from '../../widgets/ProductGrid/ProductGrid.jsx';
@@ -11,9 +11,19 @@ export default function CatalogPage() {
   const dispatch = useDispatch();
   const { sneakers, loading, error, search, filters, sort, page } = useSelector((state) => state.sneakers);
 
+  const initialRender = useRef(true);
+
   useEffect(() => {
     dispatch(getSneakers());
   }, [dispatch, search, filters, sort, page]);
+
+  useEffect(() => {
+    if (initialRender.current) {
+      initialRender.current = false;
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [page]);
 
   const handleSearch = useCallback((query) => dispatch(setSearch(query)), [dispatch]);
 
