@@ -7,7 +7,7 @@ import { ProductGrid } from '../../widgets/ProductGrid/ProductGrid.jsx';
 import { AnimateOnScroll } from '../../shared/ui/AnimateOnScroll.jsx';
 import { getSneakers } from '../../features/sneakers/sneakersSlice.js';
 
-const brands = ['Nike', 'Adidas', 'Jordan', 'New Balance', 'On Cloud', 'Onitsuka', 'Golden Goose', 'The North Face', 'Timberland Boots', 'Birkenstock', 'Salomon', 'Zegna' ];
+const brands = ['Nike', 'Adidas', 'Jordan', 'New Balance', 'On Cloud', 'Onitsuka', 'Golden Goose', 'The North Face', 'Timberland Boots', 'UGG', 'Salomon', 'Zegna' ];
 
 export default function HomePage() {
   const dispatch = useDispatch();
