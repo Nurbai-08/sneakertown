@@ -10,7 +10,7 @@ export const getSneakers = createAsyncThunk('sneakers/getSneakers', async (_, { 
       sort,
       ...(search ? { name: search } : {}),
       ...(filters.brand ? { brand: filters.brand } : {}),
-      ...(filters.releaseDate ? { releaseDate: filters.releaseDate } : {}),
+      ...(filters.size ? { size: filters.size } : {}),
       ...(filters.minPrice ? { minPrice: filters.minPrice } : {}),
       ...(filters.maxPrice ? { maxPrice: filters.maxPrice } : {}),
     };
@@ -50,7 +50,7 @@ const sneakersSlice = createSlice({
       brand: '',
       minPrice: '',
       maxPrice: '',
-      releaseDate: '',
+      size: '',
     },
     sort: 'releaseDate:desc',
     page: 1,
@@ -73,7 +73,7 @@ const sneakersSlice = createSlice({
       state.page = action.payload;
     },
     clearFilters(state) {
-      state.filters = { brand: '', minPrice: '', maxPrice: '', releaseDate: '' };
+      state.filters = { brand: '', minPrice: '', maxPrice: '', size: '' };
       state.search = '';
       state.page = 1;
     },

@@ -10,7 +10,6 @@ export default function CartPage() {
   const dispatch = useDispatch();
   const { items, totalItems, totalPrice } = useSelector((state) => state.cart);
 
-
   const handleCheckout = () => {
     dispatch(clearCart());
 
@@ -39,19 +38,20 @@ export default function CartPage() {
           <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
             <div className="grid gap-3">
               {items.map((item) => (
-                <article key={item.id} className="grid gap-4 rounded-md border border-neutral-200 p-4 dark:border-neutral-800 sm:grid-cols-[120px_1fr_auto]">
+                <article key={item.cartKey} className="grid gap-4 rounded-md border border-neutral-200 p-4 dark:border-neutral-800 sm:grid-cols-[120px_1fr_auto]">
                   <img className="h-28 w-28 rounded-md bg-neutral-100 object-contain p-2 dark:bg-neutral-900" src={item.image} alt={item.name} />
                   <div>
                     <p className="text-xs font-bold uppercase text-accent">{item.brand}</p>
                     <Link className="mt-1 block font-bold hover:text-accent" to={`/product/${encodeURIComponent(item.id)}`}>{item.name}</Link>
-                    <p className="mt-2 text-sm text-neutral-500">{formatPrice(item.retailPrice)}</p>
+                    <p className="mt-1 text-sm text-neutral-500">Размер: {item.selectedSize}</p>
+                    <p className="mt-1 text-sm text-neutral-500">{formatPrice(item.retailPrice)}</p>
                   </div>
                   <div className="flex items-center gap-2 sm:flex-col sm:items-end sm:justify-between">
-                    <button className="text-neutral-500 hover:text-red-600" type="button" aria-label="Удалить" onClick={() => dispatch(removeFromCart(item.id))}><FiTrash2 /></button>
+                    <button className="text-neutral-500 hover:text-red-600" type="button" aria-label="Удалить" onClick={() => dispatch(removeFromCart(item.cartKey))}><FiTrash2 /></button>
                     <div className="flex items-center rounded-md border border-neutral-200 dark:border-neutral-800">
-                      <button className="grid h-9 w-9 place-items-center" type="button" aria-label="Уменьшить" onClick={() => dispatch(decreaseQuantity(item.id))}><FiMinus /></button>
+                      <button className="grid h-9 w-9 place-items-center" type="button" aria-label="Уменьшить" onClick={() => dispatch(decreaseQuantity(item.cartKey))}><FiMinus /></button>
                       <span className="grid h-9 min-w-10 place-items-center text-sm font-bold">{item.quantity}</span>
-                      <button className="grid h-9 w-9 place-items-center" type="button" aria-label="Увеличить" onClick={() => dispatch(increaseQuantity(item.id))}><FiPlus /></button>
+                      <button className="grid h-9 w-9 place-items-center" type="button" aria-label="Увеличить" onClick={() => dispatch(increaseQuantity(item.cartKey))}><FiPlus /></button>
                     </div>
                   </div>
                 </article>
@@ -69,5 +69,4 @@ export default function CartPage() {
     </PageLayout>
   );
 }
-       
-
+        

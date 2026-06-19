@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FiHeart, FiShoppingBag } from 'react-icons/fi';
 import { addToCart } from '../../features/cart/cartSlice.js';
 import { addFavorite, removeFavorite } from '../../features/favorites/favoritesSlice.js';
-import { formatDate, formatPrice } from '../../shared/utils/formatters.js';
+import { formatPrice } from '../../shared/utils/formatters.js';
 import { useToast } from '../../app/providers/ToastProvider.jsx';
 
 export const ProductCard = memo(({ sneaker }) => {
@@ -12,9 +12,13 @@ export const ProductCard = memo(({ sneaker }) => {
   const { showToast } = useToast();
   const isFavorite = useSelector((state) => state.favorites.favorites.some((item) => item.id === sneaker.id));
 
+  const hasSizes = sneaker.sizes && sneaker.sizes.length > 0;
+
   const handleCart = () => {
-    dispatch(addToCart(sneaker));
-    showToast('Товар добавлен в корзину');
+    if (!hasSizes) return;
+    const size = sneaker.sizes[0];
+    dispatch(addToCart({ ...sneaker, selectedSize: size }));
+    showToast(`Товар добавлен в корзину (${size})`);
   };
 
   const handleFavorite = () => {
@@ -42,11 +46,16 @@ export const ProductCard = memo(({ sneaker }) => {
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="text-lg font-black">{formatPrice(sneaker.retailPrice)}</p>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">{formatDate(sneaker.releaseDate)}</p>
           </div>
-          <button className="btn-primary h-10 w-10 p-0" type="button" aria-label="В корзину" onClick={handleCart}>
-            <FiShoppingBag />
-          </button>
+          {hasSizes ? (
+            <button className="btn-primary h-10 w-10 p-0" type="button" aria-label="В корзину" onClick={handleCart}>
+              <FiShoppingBag />
+            </button>
+          ) : (
+            <span className="grid h-10 rounded-md border border-neutral-200 bg-neutral-50 px-2 text-xs font-bold text-neutral-400 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-500">
+              Нет в наличии
+            </span>
+          )}
         </div>
       </div>
     </article>

@@ -9,6 +9,8 @@ const calculate = (items) => ({
 });
 const persist = (items) => storage.set(CART_KEY, items);
 
+const cartKey = (id, size) => `${id}__${size}`;
+
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {
@@ -22,27 +24,32 @@ const cartSlice = createSlice({
       persist(state.items);
     },
     addToCart(state, action) {
-      const item = state.items.find((entry) => entry.id === action.payload.id);
-      if (item) item.quantity += 1;
-      else state.items.push({ ...action.payload, quantity: 1 });
+      const { selectedSize, ...sneaker } = action.payload;
+      const key = cartKey(sneaker.id, selectedSize);
+      const existing = state.items.find((entry) => entry.cartKey === key);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        state.items.push({ ...sneaker, selectedSize, cartKey: key, quantity: 1 });
+      }
       Object.assign(state, calculate(state.items));
       persist(state.items);
     },
     removeFromCart(state, action) {
-      state.items = state.items.filter((item) => item.id !== action.payload);
+      state.items = state.items.filter((item) => item.cartKey !== action.payload);
       Object.assign(state, calculate(state.items));
       persist(state.items);
     },
     increaseQuantity(state, action) {
-      const item = state.items.find((entry) => entry.id === action.payload);
+      const item = state.items.find((entry) => entry.cartKey === action.payload);
       if (item) item.quantity += 1;
       Object.assign(state, calculate(state.items));
       persist(state.items);
     },
     decreaseQuantity(state, action) {
-      const item = state.items.find((entry) => entry.id === action.payload);
+      const item = state.items.find((entry) => entry.cartKey === action.payload);
       if (item && item.quantity > 1) item.quantity -= 1;
-      else state.items = state.items.filter((entry) => entry.id !== action.payload);
+      else state.items = state.items.filter((entry) => entry.cartKey !== action.payload);
       Object.assign(state, calculate(state.items));
       persist(state.items);
     },

@@ -30,8 +30,13 @@ export const FiltersSidebar = ({ filters, onChange, onClear }) => (
       </div>
 
       <label className="grid gap-2 text-sm font-semibold">
-        Дата релиза
-        <input className="input-field" type="date" value={filters.releaseDate} onChange={(event) => onChange({ releaseDate: event.target.value })} />
+        Размер
+        <select className="input-field" value={filters.size} onChange={(event) => onChange({ size: event.target.value })}>
+          <option value="">Все размеры</option>
+          {Array.from({ length: 11 }, (_, i) => i + 36).map((size) => (
+            <option key={size} value={size}>{size}</option>
+          ))}
+        </select>
       </label>
     </div>
   </aside>

@@ -13,6 +13,19 @@ const pickImage = (image) =>
   image ||
   'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80';
 
+const DEFAULT_SIZES = [39, 40, 41, 42, 43, 44, 45];
+
+const getSizes = (item) => {
+  if (item.sizes && Array.isArray(item.sizes)) return item.sizes;
+  if (item.sizeStock && typeof item.sizeStock === 'object') {
+    return Object.entries(item.sizeStock)
+      .filter(([, stock]) => stock > 0)
+      .map(([size]) => Number(size));
+  }
+  if (item.availableSizes && Array.isArray(item.availableSizes)) return item.availableSizes;
+  return DEFAULT_SIZES;
+};
+
 export const normalizeSneaker = (item) => ({
   id: item.id || item._id || item.sku || item.name,
   name: item.name || item.title || 'Кроссовки',
@@ -24,6 +37,7 @@ export const normalizeSneaker = (item) => ({
   image: pickImage(item.image),
   gender: item.gender,
   sku: item.sku,
+  sizes: getSizes(item),
 });
 
 const normalizeList = (data) => {
@@ -44,7 +58,7 @@ const fallbackSneakers = (params = {}) => {
     .filter((item) => !query || `${item.name} ${item.brand}`.toLowerCase().includes(query))
     .filter((item) => !brand || item.brand.toLowerCase() === brand)
     .filter((item) => Number(item.retailPrice) >= minPrice && Number(item.retailPrice) <= maxPrice)
-    .filter((item) => !params.releaseDate || item.releaseDate === params.releaseDate)
+    .filter((item) => !params.size || (item.sizes && item.sizes.includes(Number(params.size))))
     .sort((a, b) => {
       const direction = sortDirection === 'asc' ? 1 : -1;
       if (sortField === 'name') return a.name.localeCompare(b.name) * direction;

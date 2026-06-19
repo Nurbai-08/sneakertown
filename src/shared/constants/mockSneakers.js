@@ -8,8 +8,9 @@ export const mockSneakers = [
     releaseDate: '1982-10-26',
     description: 'Идеальный баланс классического стиля и повседневного комфорта.',
     image: 'https://sneakertown.kg/cdn/shop/files/IMG-2693.png?v=1763041096&width=2560',
-    sku: 'CW2288-111', 
-},
+    sku: 'CW2288-111',
+    sizes: [39, 40, 41, 42, 43, 44, 45],
+  },
   {
     id: 'mock-adidas-gazelle',
     name: 'Adidas Gazelle Pink',
@@ -20,6 +21,7 @@ export const mockSneakers = [
     description: 'Главный хит уличной моды и ретро-эстетики.',
     image: 'https://sneakertown.kg/cdn/shop/files/IMG-2970.png?v=1763376143&width=1200',
     sku: 'B75807',
+    sizes: [36, 37, 38, 39, 40, 41, 42],
   },
   {
     id: 'mock-jordan-air',
@@ -31,6 +33,7 @@ export const mockSneakers = [
     description: 'Премиальное воплощение баскетбольного наследия в культовой синей расцветке.',
     image: 'https://sneakertown.kg/cdn/shop/files/scene_0ceff9ef-49ef-450f-894d-4483c68d5e03.png?v=1763306867&width=1200',
     sku: 'DZ5485-612',
+    sizes: [40, 41, 42, 43, 44, 45],
   },
   {
     id: 'mock-new-balance-pigment',
@@ -42,6 +45,7 @@ export const mockSneakers = [
     description: 'Идеальное воплощение технологичного бегового ретро-стиля в глубоком темно-синем цвете.',
     image: 'https://sneakertown.kg/cdn/shop/files/IMG-2974.png?v=1763376143&width=2560',
     sku: 'U9060ECA',
+    sizes: [39, 40, 41, 42, 43, 44],
   },
   {
     id: 'mock-on-cloud-x4-chambray',
@@ -53,10 +57,11 @@ export const mockSneakers = [
     description: 'Премиальный швейцарский комфорт для бега, тренировок и активного дня.',
     image: 'https://sneakertown.kg/cdn/shop/files/424489.png?v=1776418122&width=3840',
     sku: 'VN000D3HY28',
+    sizes: [39, 40, 41, 42, 43, 44, 45, 46],
   },
   {
     id: 'mock-nike-x-patta',
-    name: 'Nike x Patta “Rush Maroon”',
+    name: 'Nike x Patta "Rush Maroon"',
     brand: 'nike',
     retailPrice: 5000,
     colorway: "Metallic Silver / Rush Maroon",
@@ -64,6 +69,7 @@ export const mockSneakers = [
     description: 'Коллекционная коллаборация, стирающая границы между спортом и уличной культурой.',
     image: 'https://sneakertown.kg/cdn/shop/files/scene_dd206a16-220b-459d-b55e-d6bc3caa2790.png?v=1763306867&width=1200',
     sku: '374915-04',
+    sizes: [],
   },
   {
     id: 'mock-golden-goose-ballstar',
@@ -75,6 +81,7 @@ export const mockSneakers = [
     description: 'Культовое сочетание ретро-эстетики 80-х и уличного люкса.',
     image: 'https://sneakertown.kg/cdn/shop/files/scene_13a7abbe-439c-4907-b967-3e9e85025fca.png?v=1763112508&width=1200',
     sku: 'AR0456',
+    sizes: [40, 41, 42, 43, 44],
   },
   {
     id: 'mock-adidas-sl72',
@@ -86,6 +93,7 @@ export const mockSneakers = [
     description: 'Главный вирусный тренд уличной моды, сочетающий архивный беговой силуэт и эстетику 70-х.',
     image: 'https://sneakertown.kg/cdn/shop/files/IMG-3092.png?v=1763452364&width=1200',
     sku: '162053C',
+    sizes: [37, 38, 39, 40, 41, 42, 43, 44],
   },
   {
     id: 'mock-golden-goose-white',
@@ -97,6 +105,7 @@ export const mockSneakers = [
     description: 'Обновленное премиальное переосмысление университетского спортивного стиля и культовой эстетики «идеального несовершенства.',
     image: 'https://sneakertown.kg/cdn/shop/files/scene_e86e9db3-5785-4331-999a-64c9c6202570.png?v=1763112508&width=1200',
     sku: 'AS0456',
+    sizes: [39, 40, 41, 42, 43, 44],
   },
   {
     id: 'mock-new-balance-992',
@@ -108,6 +117,7 @@ export const mockSneakers = [
     description: 'Эталон изысканного минимализма и один из самых разыскиваемых релизов в истории снейкер-культуры.',
     image: 'https://sneakertown.kg/cdn/shop/files/IMG-5260.webp?v=1767872796&width=1200',
     sku: 'U7060ECA',
+    sizes: [],
   },
   {
     id: 'mock-jordan-air-travis-scott',
@@ -119,6 +129,7 @@ export const mockSneakers = [
     description: 'Главный священный грааль современной снейкер-культуры и вершина хайп-эстетики.',
     image: 'https://sneakertown.kg/cdn/shop/files/Instagram_post_-_56_8b203a22-96b3-48d0-a1f0-72bfae505896.png?v=1762949858&width=1200',
     sku: 'DZ5483-612',
+    sizes: [],
   },
   {
     id: 'mock-on-cloud-2-white',
@@ -130,6 +141,7 @@ export const mockSneakers = [
     description: 'Премиальный швейцарский комфорт для бега, тренировок и активного дня.',
     image: 'https://sneakertown.kg/cdn/shop/files/424482.png?v=1776418289&width=1200',
     sku: 'VN030D3HY28',
+    sizes: [39, 40, 41, 42, 43, 44, 45, 46],
   },
   {
     id: 'mock-on-cloud-x4-snake',
@@ -141,6 +153,7 @@ export const mockSneakers = [
     description: 'Премиальный швейцарский комфорт для бега, тренировок и активного дня.',
     image: 'https://sneakertown.kg/cdn/shop/files/424492.png?v=1776418037&width=1200',
     sku: 'VN000D3HY88',
+    sizes: [],
   },
   {
     id: 'mock-new-balance-2002',
@@ -152,6 +165,7 @@ export const mockSneakers = [
     description: 'Абсолютная икона серого стритвира: архивный беговой силуэт в премиальном исполнении.',
     image: 'https://sneakertown.kg/cdn/shop/files/IMG-3475_ac7ad63e-40cb-4497-8a4e-fba0a167dcc8.png?v=1763980795&width=2560',
     sku: 'U7060ECE',
+    sizes: [40, 41, 42, 43, 44, 45],
   },
   {
     id: 'mock-onitsuka-tiger-yellow',
@@ -163,6 +177,7 @@ export const mockSneakers = [
     description: 'Лёгкие, гибкие кроссовки в фирменном ретро-стиле бренда.',
     image: 'https://sneakertown.kg/cdn/shop/files/IMG-3398.png?v=1763815110&width=1200',
     sku: 'U70606CE',
+    sizes: [37, 38, 39, 40, 41, 42, 43],
   },
   {
     id: 'mock-onitsuka-tiger-green',
@@ -174,6 +189,7 @@ export const mockSneakers = [
     description: 'Лёгкие, гибкие кроссовки в фирменном ретро-стиле бренда.',
     image: 'https://sneakertown.kg/cdn/shop/files/IMG-3401.png?v=1763815434&width=3840',
     sku: '970606CE',
+    sizes: [37, 38, 39, 40, 41, 42, 43],
   },
   {
     id: 'mock-onitsuka-tiger-grey',
@@ -185,6 +201,7 @@ export const mockSneakers = [
     description: 'Лёгкие, гибкие кроссовки в фирменном ретро-стиле бренда.',
     image: 'https://sneakertown.kg/cdn/shop/files/IMG-3397.png?v=1763815995&width=1200',
     sku: '972606CE',
+    sizes: [37, 38, 39, 40, 41, 42, 43],
   },
   {
     id: 'mock-onitsuka-tiger-black-white',
@@ -196,6 +213,7 @@ export const mockSneakers = [
     description: 'Лёгкие, гибкие кроссовки в фирменном ретро-стиле бренда.',
     image: 'https://sneakertown.kg/cdn/shop/files/IMG-3396.png?v=1763815653&width=1200',
     sku: '972609CE',
+    sizes: [36, 37, 38, 39, 40, 41, 42],
   },
   {
     id: 'mock-onitsuka-tiger-classic',
@@ -207,6 +225,7 @@ export const mockSneakers = [
     description: 'Лёгкие, гибкие кроссовки в фирменном ретро-стиле бренда.',
     image: 'https://sneakertown.kg/cdn/shop/files/IMG-3399.png?v=1763815903&width=1200',
     sku: '972686CE',
+    sizes: [36, 37, 38, 39, 40, 41, 42, 43, 44],
   },
   {
     id: 'mock-onitsuka-tiger-gold',
@@ -218,6 +237,7 @@ export const mockSneakers = [
     description: 'Лёгкие, гибкие кроссовки в фирменном ретро-стиле бренда.',
     image: 'https://sneakertown.kg/cdn/shop/files/IMG-3400.png?v=1763815867&width=1200',
     sku: '972686DE',
+    sizes: [36, 37, 38, 39, 40, 41, 42, 43],
   },
   {
     id: 'mock-onitsuka-corsair',
@@ -229,6 +249,7 @@ export const mockSneakers = [
     description: 'Классический кроссовок с богатой историей и современным стилем.',
     image: 'https://sneakertown.kg/cdn/shop/files/1183C317_401_SR_RT_GLB.webp?v=1776423730&width=1200',
     sku: '972M86DE',
+    sizes: [39, 40, 41, 42, 43, 44, 45],
   },
   {
     id: 'mock-timberland-boots-black',
@@ -240,6 +261,7 @@ export const mockSneakers = [
     description: 'Абсолютная икона всепогодного стритвира: легендарный водонепроницаемый силуэт в премиальном черном исполнении.',
     image: 'https://sneakertown.kg/cdn/shop/files/scene_3cd98903-9c00-43f3-b189-bcba69e4cfe7.png?v=1763198817&width=1200',
     sku: '978K86KU',
+    sizes: [40, 41, 42, 43, 44, 45, 46],
   },
    {
     id: 'mock-timberland-boots-orange',
@@ -251,6 +273,7 @@ export const mockSneakers = [
     description: 'Абсолютная икона всепогодного стритвира: легендарный водонепроницаемый силуэт в премиальном оранжевом исполнении.',
     image: 'https://sneakertown.kg/cdn/shop/files/scene_d34246ef-2c02-4d84-a3ab-4392a9411458.png?v=1763198799&width=3840',
     sku: '978K80KU',
+    sizes: [40, 41, 42, 43, 44, 45, 46],
   },
   {
     id: 'mock-timberland-premium',
@@ -262,5 +285,6 @@ export const mockSneakers = [
     description: 'Абсолютная икона всепогодного стритвира: легендарный водонепроницаемый силуэт в премиальном оранжевом исполнении.',
     image: 'https://sneakertown.kg/cdn/shop/files/scene_f9e28fdc-cdd8-4438-a1e7-1967cca08122.png?v=1763198365&width=1200',
     sku: '978K78KU',
+    sizes: [41, 42, 43, 44, 45, 46],
   },
 ];
