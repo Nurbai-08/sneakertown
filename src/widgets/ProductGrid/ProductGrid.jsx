@@ -19,8 +19,8 @@ export const ProductGrid = ({ items, loading, emptyText = 'Попробуйте 
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {items.map((sneaker) => (
-        <ProductCard key={sneaker.id} sneaker={sneaker} />
+      {items.map((sneaker, index) => (
+        <ProductCard key={sneaker.id} sneaker={sneaker} index={index} />
       ))}
     </div>
   );

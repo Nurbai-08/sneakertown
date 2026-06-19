@@ -7,7 +7,7 @@ import { addFavorite, removeFavorite } from '../../features/favorites/favoritesS
 import { formatPrice } from '../../shared/utils/formatters.js';
 import { useToast } from '../../app/providers/ToastProvider.jsx';
 
-export const ProductCard = memo(({ sneaker }) => {
+export const ProductCard = memo(({ sneaker, index = 0 }) => {
   const dispatch = useDispatch();
   const { showToast } = useToast();
   const isFavorite = useSelector((state) => state.favorites.favorites.some((item) => item.id === sneaker.id));
@@ -27,7 +27,7 @@ export const ProductCard = memo(({ sneaker }) => {
   };
 
   return (
-    <article className="group overflow-hidden rounded-md border border-neutral-200 bg-white transition hover:-translate-y-1 hover:shadow-soft dark:border-neutral-800 dark:bg-neutral-900">
+    <article className="animate-fade-in-up group overflow-hidden rounded-md border border-neutral-200 bg-white transition hover:-translate-y-1 hover:shadow-soft dark:border-neutral-800 dark:bg-neutral-900" style={{ animationDelay: `${index * 0.08}s` }}>
       <Link to={`/product/${encodeURIComponent(sneaker.id)}`} className="block aspect-square bg-neutral-100 dark:bg-neutral-800">
         <img className="h-full w-full object-contain p-5 transition group-hover:scale-105" src={sneaker.image} alt={sneaker.name} loading="lazy" />
       </Link>

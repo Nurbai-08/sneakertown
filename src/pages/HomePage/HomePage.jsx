@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { PageLayout } from '../layout/PageLayout.jsx';
 import { HeroBanner } from '../../widgets/HeroBanner/HeroBanner.jsx';
 import { ProductGrid } from '../../widgets/ProductGrid/ProductGrid.jsx';
+import { AnimateOnScroll } from '../../shared/ui/AnimateOnScroll.jsx';
 import { getSneakers } from '../../features/sneakers/sneakersSlice.js';
 
 const brands = ['Nike', 'Adidas', 'Jordan', 'New Balance', 'On Cloud', 'Onitsuka', 'Golden Goose', 'The North Face', 'Timberland Boots', 'Birkenstock', 'Salomon', 'Zegna' ];
@@ -12,7 +13,7 @@ export default function HomePage() {
   const dispatch = useDispatch();
   const { sneakers, loading } = useSelector((state) => state.sneakers);
   const newest = useMemo(() => sneakers.slice(0, 4), [sneakers]);
-  const popular = useMemo(() => sneakers.slice(4, 8), [sneakers]);
+  const popular = useMemo(() => sneakers.slice(4, 12), [sneakers]);
 
   useEffect(() => {
     if (!sneakers.length) dispatch(getSneakers());
@@ -21,35 +22,43 @@ export default function HomePage() {
   return (
     <PageLayout>
       <HeroBanner />
-      <section className="container-page py-12">
-        <div className="mb-6 flex items-end justify-between gap-4">
-          <div>
-            <p className="text-2xl font-bold uppercase text-accent">Популярные</p>
+      <AnimateOnScroll>
+        <section className="container-page py-12">
+          <div className="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-2xl font-bold uppercase text-accent">Популярные</p>
+            </div>
+            <Link className="text-sm font-bold text-accent" to="/catalog">Все товары</Link>
           </div>
-          <Link className="text-sm font-bold text-accent" to="/catalog">Все товары</Link>
-        </div>
-        <ProductGrid items={popular} loading={loading} />
-      </section>
+          <ProductGrid items={popular} loading={loading} />
+        </section>
+      </AnimateOnScroll>
 
       <section className="border-y border-neutral-200 bg-neutral-50 py-12 dark:border-neutral-800 dark:bg-neutral-900/40">
         <div className="container-page">
-          <p className="text-2xl font-bold uppercase text-accent">Бренды</p>
+          <AnimateOnScroll>
+            <p className="text-2xl font-bold uppercase text-accent">Бренды</p>
+          </AnimateOnScroll>
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {brands.map((brand) => (
-              <div key={brand} className="rounded-md border border-neutral-200 bg-white p-5 text-center text-lg font-black transition dark:border-neutral-800 dark:bg-neutral-950">
-                {brand}
-              </div>
+            {brands.map((brand, i) => (
+              <AnimateOnScroll key={brand} delay={i * 0.05}>
+                <div className="rounded-md border border-neutral-200 bg-white p-5 text-center text-lg font-black transition hover:-translate-y-1 hover:shadow-soft dark:border-neutral-800 dark:bg-neutral-950">
+                  {brand}
+                </div>
+              </AnimateOnScroll>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="container-page py-12">
-        <div className="mb-6">
-          <p className="text-2xl font-bold uppercase text-accent">Новинки</p>
-        </div>
-        <ProductGrid items={newest} loading={loading} />
-      </section>
+      <AnimateOnScroll>
+        <section className="container-page py-12">
+          <div className="mb-6">
+            <p className="text-2xl font-bold uppercase text-accent">Новинки</p>
+          </div>
+          <ProductGrid items={newest} loading={loading} />
+        </section>
+      </AnimateOnScroll>
     </PageLayout>
   );
 }

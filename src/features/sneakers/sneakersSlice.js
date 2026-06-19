@@ -5,7 +5,7 @@ export const getSneakers = createAsyncThunk('sneakers/getSneakers', async (_, { 
   try {
     const { search, filters, sort, page } = getState().sneakers;
     const params = {
-      limit: 24,
+      limit: 12,
       page,
       sort,
       ...(search ? { name: search } : {}),

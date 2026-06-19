@@ -43,7 +43,7 @@ export default function CatalogPage() {
             <div className="mt-8 flex justify-center gap-2">
               <button className="btn-secondary" type="button" disabled={page <= 1} onClick={() => dispatch(setPage(page - 1))}>Назад</button>
               <span className="grid h-11 min-w-11 place-items-center rounded-md border border-neutral-200 px-4 text-sm font-bold dark:border-neutral-800">{page}</span>
-              <button className="btn-secondary" type="button" disabled={sneakers.length < 24} onClick={() => dispatch(setPage(page + 1))}>Вперед</button>
+              <button className="btn-secondary" type="button" disabled={sneakers.length < 12} onClick={() => dispatch(setPage(page + 1))}>Вперед</button>
             </div>
           </div>
         </div>

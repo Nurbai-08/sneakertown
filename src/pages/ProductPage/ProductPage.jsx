@@ -42,16 +42,16 @@ export default function ProductPage() {
   return (
     <PageLayout>
       <section className="container-page grid gap-8 py-10 lg:grid-cols-[minmax(0,1fr)_420px]">
-        <div className="rounded-md bg-neutral-100 p-6 dark:bg-neutral-900">
-          <img className="mx-auto max-h-[640px] w-full object-contain" src={sneaker.image} alt={sneaker.name} />
+        <div className="animate-fade-in-left rounded-md bg-neutral-100 p-6 dark:bg-neutral-900">
+          <img className="animate-scale-in mx-auto max-h-[640px] w-full object-contain" src={sneaker.image} alt={sneaker.name} />
         </div>
-        <div className="lg:sticky lg:top-24 lg:self-start">
+        <div className="animate-fade-in-right lg:sticky lg:top-24 lg:self-start" style={{ animationDelay: '0.15s' }}>
           <p className="text-sm font-bold uppercase text-accent">{sneaker.brand}</p>
           <h1 className="mt-2 text-4xl font-black">{sneaker.name}</h1>
           <p className="mt-4 text-3xl font-black">{formatPrice(sneaker.retailPrice)}</p>
 
           {hasSizes ? (
-            <div className="mt-6">
+            <div className="animate-fade-in-up mt-6" style={{ animationDelay: '0.25s' }}>
               <p className="mb-3 text-sm font-semibold text-neutral-500">Выберите размер</p>
               <div className="flex flex-wrap gap-2">
                 {sneaker.sizes.map((size) => (
@@ -81,7 +81,7 @@ export default function ProductPage() {
             <div className="flex justify-between gap-4 border-b border-neutral-200 pb-3 dark:border-neutral-800"><dt className="text-neutral-500">SKU</dt><dd className="font-semibold">{sneaker.sku || 'N/A'}</dd></div>
           </dl>
           <p className="mt-6 text-neutral-600 dark:text-neutral-300">{sneaker.description}</p>
-          <div className="mt-8 grid gap-3 sm:grid-cols-2">
+          <div className="animate-fade-in-up mt-8 grid gap-3 sm:grid-cols-2" style={{ animationDelay: '0.35s' }}>
             <button
               className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
               type="button"
