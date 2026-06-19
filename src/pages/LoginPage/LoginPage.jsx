@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiMail } from 'react-icons/fi';
 import { PageLayout } from '../layout/PageLayout.jsx';
@@ -10,15 +10,17 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { showToast } = useToast();
   const { loading, error, user, authReady } = useSelector((state) => state.auth);
+  const from = location.state?.from || '/profile';
 
-  if (authReady && user) return <Navigate to="/profile" replace />;
+  if (authReady && user) return <Navigate to={from} replace />;
 
   const submit = async (event) => {
     event.preventDefault();
     const result = await dispatch(loginUser(form));
-    if (loginUser.fulfilled.match(result)) navigate('/profile', { replace: true });
+    if (loginUser.fulfilled.match(result)) navigate(from, { replace: true });
   };
 
   const recover = async () => {
@@ -44,7 +46,7 @@ export default function LoginPage() {
               disabled={loading}
               onClick={async () => {
                 const result = await dispatch(loginWithGoogle());
-                if (loginWithGoogle.fulfilled.match(result)) navigate('/profile', { replace: true });
+                if (loginWithGoogle.fulfilled.match(result)) navigate(from, { replace: true });
               }}
             >
               <FiMail /> Войти через Google
@@ -52,7 +54,7 @@ export default function LoginPage() {
           </div>
           <div className="mt-5 flex flex-wrap justify-between gap-3 text-sm">
             <button className="font-semibold text-accent" type="button" onClick={recover}>Забыли пароль?</button>
-            <Link className="font-semibold text-accent" to="/register">Создать аккаунт</Link>
+            <Link className="font-semibold text-accent" to="/register" state={{ from }}>Создать аккаунт</Link>
           </div>
         </form>
       </section>

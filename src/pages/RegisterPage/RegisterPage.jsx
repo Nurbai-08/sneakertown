@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { PageLayout } from "../layout/PageLayout.jsx";
 import { registerUser } from "../../shared/services/authSlice.js";
@@ -12,15 +12,17 @@ export default function RegisterPage() {
   });
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { loading, error, user, authReady } = useSelector((state) => state.auth);
+  const from = location.state?.from || '/profile';
 
-  if (authReady && user) return <Navigate to="/profile" replace />;
+  if (authReady && user) return <Navigate to={from} replace />;
 
   const submit = async (event) => {
     event.preventDefault();
     try {
       await dispatch(registerUser(form)).unwrap();
-      navigate("/profile", { replace: true });
+      navigate(from, { replace: true });
     } catch (err) {
       console.log(err);
     }

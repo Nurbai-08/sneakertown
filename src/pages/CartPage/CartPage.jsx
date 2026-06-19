@@ -1,21 +1,29 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiMinus, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { PageLayout } from '../layout/PageLayout.jsx';
 import { clearCart, decreaseQuantity, increaseQuantity, removeFromCart } from '../../features/cart/cartSlice.js';
 import { EmptyState } from '../../shared/ui/EmptyState.jsx';
 import { formatPrice } from '../../shared/utils/formatters.js';
+import { useToast } from '../../app/providers/ToastProvider.jsx';
 
 export default function CartPage() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { showToast } = useToast();
   const { items, totalItems, totalPrice } = useSelector((state) => state.cart);
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
   const handleCheckout = () => {
-    dispatch(clearCart());
+    if (!isAuthenticated) {
+      showToast('Зарегистрируйтесь в аккаунт, чтобы оформить заказ');
+      navigate('/login', { state: { from: '/cart' } });
+      return;
+    }
 
+    dispatch(clearCart());
     setTimeout(() => {
       alert('«Заказ успешно оформлен!»');
-      
       window.location.href = '/';
     }, 100);
   };
