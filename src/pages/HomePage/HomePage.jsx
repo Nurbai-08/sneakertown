@@ -42,7 +42,7 @@ export default function HomePage() {
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {brands.map((brand, i) => (
               <AnimateOnScroll key={brand} delay={i * 0.05}>
-                <div className="rounded-md border border-neutral-200 bg-white p-5 text-center text-lg font-black transition hover:-translate-y-1 hover:shadow-soft dark:border-neutral-800 dark:bg-neutral-950">
+                <div className="flex h-14 items-center justify-center rounded-md border border-neutral-200 bg-white px-3 text-center text-sm font-black transition hover:-translate-y-1 hover:shadow-soft sm:h-16 dark:border-neutral-800 dark:bg-neutral-950">
                   {brand}
                 </div>
               </AnimateOnScroll>
