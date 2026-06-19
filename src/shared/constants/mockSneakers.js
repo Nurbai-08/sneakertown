@@ -73,6 +73,18 @@ export const mockSneakers = [
     sizes: [39, 40, 41, 42, 43, 44, 45, 46],
   },
   {
+    id: 'mock-on-cloudmonster-hyper-black',
+    name: 'On Cloudmonster Hyper Black',
+    brand: 'on cloud',
+    retailPrice: 7900,
+    colorway: 'Black',
+    releaseDate: '2025-11-17',
+    description: 'Разработанная спортсменами. Для спортсменов. Самая легкая обувь в семействе Cloudmonster с двойной подошвой из пенопласта сочетает в себе максимальную амортизацию и максимальный отскок.',
+    image: 'https://sneakertown.kg/cdn/shop/files/scene_99f74ce0-e9a2-440e-884f-02c9d13d009b.png?v=1763385180&width=1200',
+    sku: 'ON-CM-HYPER-BLK',
+    sizes: [36, 37, 38, 39, 40, 41, 42, 43, 44, 45],
+  },
+  {
     id: 'mock-nike-x-patta',
     name: 'Nike x Patta "Rush Maroon"',
     brand: 'nike',
