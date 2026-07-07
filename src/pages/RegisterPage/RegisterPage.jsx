@@ -23,8 +23,8 @@ export default function RegisterPage() {
     try {
       await dispatch(registerUser(form)).unwrap();
       navigate(from, { replace: true });
-    } catch (err) {
-      console.log(err);
+    } catch {
+      // ошибка обрабатывается через state.error в UI
     }
   };
 
@@ -52,6 +52,7 @@ export default function RegisterPage() {
               onChange={(event) =>
                 setForm({ ...form, displayName: event.target.value })
               }
+              maxLength={50}
               required
             />
             <input
@@ -67,13 +68,15 @@ export default function RegisterPage() {
             <input
               className="input-field"
               type="password"
-              placeholder="Пароль"
-              minLength="6"
+              placeholder="Пароль (минимум 8 символов)"
+              minLength="8"
               value={form.password}
               onChange={(event) =>
                 setForm({ ...form, password: event.target.value })
               }
               required
+              pattern=".{8,}"
+              title="Пароль должен содержать минимум 8 символов"
             />
             <button className="btn-primary" type="submit" disabled={loading}>
               {loading ? "Создаём аккаунт…" : "Зарегистрироваться"}

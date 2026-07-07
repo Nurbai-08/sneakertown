@@ -26,19 +26,22 @@ const getSizes = (item) => {
   return DEFAULT_SIZES;
 };
 
-export const normalizeSneaker = (item) => ({
-  id: item.id || item._id || item.sku || item.name,
-  name: item.name || item.title || 'Кроссовки',
-  brand: item.brand || item.make || 'SneakerTown',
-  retailPrice: item.retailPrice || item.estimatedMarketValue || item.price || 0,
-  colorway: item.colorway || item.color || 'Classic',
-  releaseDate: item.releaseDate || item.year || '',
-  description: item.story || item.description || 'Лаконичная модель для города, прогулок и повседневного стиля.',
-  image: pickImage(item.image),
-  gender: item.gender,
-  sku: item.sku,
-  sizes: getSizes(item),
-});
+export const normalizeSneaker = (item) => {
+  if (!item) return fallbackSneakers({ limit: 1 }).sneakers[0];
+  return {
+    id: item.id || item._id || item.sku || item.name,
+    name: item.name || item.title || 'Кроссовки',
+    brand: item.brand || item.make || 'SneakerTown',
+    retailPrice: item.retailPrice || item.estimatedMarketValue || item.price || 0,
+    colorway: item.colorway || item.color || 'Classic',
+    releaseDate: item.releaseDate || item.year || '',
+    description: item.story || item.description || 'Лаконичная модель для города, прогулок и повседневного стиля.',
+    image: pickImage(item.image),
+    gender: item.gender,
+    sku: item.sku,
+    sizes: getSizes(item),
+  };
+};
 
 const normalizeList = (data) => {
   const list = data?.results || data?.sneakers || data?.data || [];
@@ -89,9 +92,10 @@ export const sneakersApi = {
   async getSneakerById(id) {
     try {
       const { data } = await api.get(`/sneakers/${id}`);
-      return normalizeSneaker(data?.results?.[0] || data?.sneaker || data);
+      const item = data?.results?.[0] || data?.sneaker || data;
+      return item ? normalizeSneaker(item) : null;
     } catch {
-      return mockSneakers.find((item) => item.id === id) || mockSneakers[0];
+      return mockSneakers.find((item) => item.id === id) || null;
     }
   },
   async getSneakersByBrand(brand, params = {}) {

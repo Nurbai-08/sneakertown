@@ -36,9 +36,23 @@ export const userDataService = {
       { merge: true },
     );
   },
+  ALLOWED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif'],
+  MAX_AVATAR_SIZE: 5 * 1024 * 1024,
+
   async uploadAvatar(uid, file) {
     if (!isFirebaseEnabled || !uid || !file) return '';
-    const avatarRef = ref(storage, `avatars/${uid}/${file.name}`);
+
+    if (!this.ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      throw new Error('Допустимы только изображения: JPG, PNG, GIF, WebP, AVIF');
+    }
+
+    if (file.size > this.MAX_AVATAR_SIZE) {
+      throw new Error('Размер файла не должен превышать 5 МБ');
+    }
+
+    const ext = file.name.split('.').pop().toLowerCase();
+    const safeName = `${uid}_${Date.now()}.${ext}`;
+    const avatarRef = ref(storage, `avatars/${uid}/${safeName}`);
     await uploadBytes(avatarRef, file);
     return getDownloadURL(avatarRef);
   },

@@ -7,9 +7,26 @@ import {
   signOut,
   updateProfile,
 } from 'firebase/auth';
-import { auth, googleProvider, isFirebaseEnabled } from './firebase.js';
+import { auth, googleProvider, isFirebaseEnabled, mapFirebaseError } from './firebase.js';
 import { userDataService } from './userDataService.js';
 import { mapFirebaseUser, mergeAuthUser } from '../../entities/user/model.js';
+
+const AUTH_RATE_LIMIT_WINDOW = 2000;
+const authThrottle = new Map();
+
+const checkThrottle = (key) => {
+  const now = Date.now();
+  const last = authThrottle.get(key) || 0;
+  if (now - last < AUTH_RATE_LIMIT_WINDOW) {
+    throw new Error('auth/too-many-requests');
+  }
+  authThrottle.set(key, now);
+  if (authThrottle.size > 100) {
+    for (const [k, t] of authThrottle) {
+      if (now - t > AUTH_RATE_LIMIT_WINDOW * 2) authThrottle.delete(k);
+    }
+  }
+};
 
 const requireFirebase = () => {
   if (!isFirebaseEnabled) {
@@ -20,6 +37,7 @@ const requireFirebase = () => {
 export const registerUser = createAsyncThunk('auth/registerUser', async ({ email, password, displayName }, { rejectWithValue }) => {
   try {
     requireFirebase();
+    checkThrottle('register');
     const { user } = await createUserWithEmailAndPassword(auth, email, password);
     const name = displayName?.trim() || '';
 
@@ -33,33 +51,35 @@ export const registerUser = createAsyncThunk('auth/registerUser', async ({ email
       displayName: name || currentUser.displayName || '',
     };
 
-    userDataService.upsertUser({ ...currentUser, displayName: mappedUser.displayName }).catch(() => {});
+    userDataService.upsertUser({ ...currentUser, displayName: mappedUser.displayName }).catch((err) => console.error('Failed to upsert user:', err));
 
     return mappedUser;
   } catch (error) {
-    return rejectWithValue(error.message);
+    return rejectWithValue(mapFirebaseError(error));
   }
 });
 
 export const loginUser = createAsyncThunk('auth/loginUser', async ({ email, password }, { rejectWithValue }) => {
   try {
     requireFirebase();
+    checkThrottle('login');
     const { user } = await signInWithEmailAndPassword(auth, email, password);
-    userDataService.upsertUser(user).catch(() => {});
+    userDataService.upsertUser(user).catch((err) => console.error('Failed to upsert user:', err));
     return mapFirebaseUser(user);
   } catch (error) {
-    return rejectWithValue(error.message);
+    return rejectWithValue(mapFirebaseError(error));
   }
 });
 
 export const loginWithGoogle = createAsyncThunk('auth/loginWithGoogle', async (_, { rejectWithValue }) => {
   try {
     requireFirebase();
+    checkThrottle('google');
     const { user } = await signInWithPopup(auth, googleProvider);
-    userDataService.upsertUser(user).catch(() => {});
+    userDataService.upsertUser(user).catch((err) => console.error('Failed to upsert user:', err));
     return mapFirebaseUser(user);
   } catch (error) {
-    return rejectWithValue(error.message);
+    return rejectWithValue(mapFirebaseError(error));
   }
 });
 
@@ -68,17 +88,18 @@ export const logoutUser = createAsyncThunk('auth/logoutUser', async (_, { reject
     requireFirebase();
     await signOut(auth);
   } catch (error) {
-    return rejectWithValue(error.message);
+    return rejectWithValue(mapFirebaseError(error));
   }
 });
 
 export const resetPassword = createAsyncThunk('auth/resetPassword', async (email, { rejectWithValue }) => {
   try {
     requireFirebase();
+    checkThrottle('reset');
     await sendPasswordResetEmail(auth, email);
     return true;
   } catch (error) {
-    return rejectWithValue(error.message);
+    return rejectWithValue(mapFirebaseError(error));
   }
 });
 

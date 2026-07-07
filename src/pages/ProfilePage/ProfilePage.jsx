@@ -57,12 +57,9 @@ export default function ProfilePage() {
       showToast("Введите имя");
       return;
     }
-      window.location.href = "/profile";
     try {
-      
       await updateProfile(auth.currentUser, {
         displayName: displayName.trim(),
-  
       });
 
       await auth.currentUser.reload();
@@ -75,7 +72,6 @@ export default function ProfilePage() {
 
       showToast("Имя обновлено");
     } catch (error) {
-      console.error(error);
       showToast(error.message || "Ошибка при обновлении имени");
     }
   };
@@ -98,14 +94,13 @@ export default function ProfilePage() {
 
         <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
           <aside className="rounded-md border border-neutral-200 pt-[5.25rem] text-center dark:border-neutral-800">
-            <img
-              className="mx-auto h-32 w-32 rounded-full bg-neutral-100 object-cover dark:bg-neutral-900"
-              src={
-                user.photoURL ||
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || user.email)}&background=f97316&color=fff`
-              }
-              alt={user.displayName || user.email}
-            />
+            {user.photoURL?.startsWith('http') ? (
+              <img className="mx-auto h-32 w-32 rounded-full bg-neutral-100 object-cover dark:bg-neutral-900" src={user.photoURL} alt={user.displayName || user.email} />
+            ) : (
+              <div className="mx-auto grid h-32 w-32 place-items-center rounded-full bg-gradient-to-br from-orange-400 to-orange-600 text-4xl font-black text-white">
+                {(user.displayName || user.email || '?').charAt(0).toUpperCase()}
+              </div>
+            )}
             <h2 className="mt-4 text-xl font-black">
               {user.displayName || "Покупатель"}
             </h2>
@@ -121,6 +116,7 @@ export default function ProfilePage() {
                   className="input-field"
                   value={displayName}
                   onChange={(event) => setDisplayName(event.target.value)}
+                  maxLength={50}
                 />
               </label>
               <label className="grid gap-2 text-sm font-semibold">

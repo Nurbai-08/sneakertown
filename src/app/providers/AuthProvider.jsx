@@ -1,4 +1,4 @@
-import { onAuthStateChanged, updateProfile } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAuthReady, setUser } from '../../shared/services/authSlice.js';
@@ -23,8 +23,11 @@ export const AuthProvider = ({ children }) => {
   const favorites = useSelector((state) => state.favorites.favorites);
   const user = useSelector((state) => state.auth.user);
   const hydratedUid = useRef(null);
+  const hydratingUid = useRef(null);
   const cartItemsRef = useRef(cartItems);
   const favoritesRef = useRef(favorites);
+  const cartSyncTimer = useRef(null);
+  const favSyncTimer = useRef(null);
 
   useEffect(() => {
     cartItemsRef.current = cartItems;
@@ -54,6 +57,8 @@ export const AuthProvider = ({ children }) => {
       dispatch(setAuthReady(true));
 
       const uid = activeUser.uid;
+      if (hydratingUid.current === uid) return;
+      hydratingUid.current = uid;
 
       void (async () => {
         try {
@@ -88,8 +93,8 @@ export const AuthProvider = ({ children }) => {
               userDataService.saveUserCollection('favorites', uid, mergedFavorites),
             ]);
           }
-        } catch (error) {
-          console.error(error);
+        } catch (err) {
+          console.error('Failed to sync user data:', err);
         }
       })();
     });
@@ -97,20 +102,21 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (!user?.uid || hydratedUid.current !== user.uid) return;
-    userDataService.saveUserCollection('cart', user.uid, cartItems);
+    clearTimeout(cartSyncTimer.current);
+    cartSyncTimer.current = setTimeout(() => {
+      userDataService.saveUserCollection('cart', user.uid, cartItems).catch((err) => console.error('Failed to save cart:', err));
+    }, 500);
+    return () => clearTimeout(cartSyncTimer.current);
   }, [cartItems, user?.uid]);
 
   useEffect(() => {
     if (!user?.uid || hydratedUid.current !== user.uid) return;
-    userDataService.saveUserCollection('favorites', user.uid, favorites);
+    clearTimeout(favSyncTimer.current);
+    favSyncTimer.current = setTimeout(() => {
+      userDataService.saveUserCollection('favorites', user.uid, favorites).catch((err) => console.error('Failed to save favorites:', err));
+    }, 500);
+    return () => clearTimeout(favSyncTimer.current);
   }, [favorites, user?.uid]);
-
-  window.updateSneakerTownProfile = async ({ displayName, photoURL }) => {
-    if (!auth?.currentUser) return;
-    await updateProfile(auth.currentUser, { displayName, photoURL });
-    dispatch(setUser(mapFirebaseUser(auth.currentUser)));
-    await userDataService.upsertUser(auth.currentUser);
-  };
 
   return children;
 };

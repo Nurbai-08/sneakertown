@@ -22,10 +22,8 @@ export default function CartPage() {
     }
 
     dispatch(clearCart());
-    setTimeout(() => {
-      alert('«Заказ успешно оформлен!»');
-      window.location.href = '/';
-    }, 100);
+    showToast('Заказ успешно оформлен!');
+    navigate('/');
   };
  
 
