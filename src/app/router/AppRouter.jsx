@@ -9,6 +9,8 @@ const FavoritesPage = lazy(() => import('../../pages/FavoritesPage/FavoritesPage
 const ProfilePage = lazy(() => import('../../pages/ProfilePage/ProfilePage.jsx'));
 const LoginPage = lazy(() => import('../../pages/LoginPage/LoginPage.jsx'));
 const RegisterPage = lazy(() => import('../../pages/RegisterPage/RegisterPage.jsx'));
+const ResetPasswordPage = lazy(() => import('../../pages/ResetPasswordPage/ResetPasswordPage.jsx'));
+const AuthCallbackPage = lazy(() => import('../../pages/AuthCallbackPage/AuthCallbackPage.jsx'));
 const NotFoundPage = lazy(() => import('../../pages/NotFoundPage/NotFoundPage.jsx'));
 
 export const AppRouter = () => (
@@ -21,6 +23,8 @@ export const AppRouter = () => (
     <Route path="/profile" element={<ProfilePage />} />
     <Route path="/login" element={<LoginPage />} />
     <Route path="/register" element={<RegisterPage />} />
+    <Route path="/reset-password" element={<ResetPasswordPage />} />
+    <Route path="/auth/callback" element={<AuthCallbackPage />} />
     <Route path="*" element={<NotFoundPage />} />
   </Routes>
 );

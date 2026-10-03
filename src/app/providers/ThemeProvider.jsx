@@ -1,7 +1,7 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { storage } from '../../shared/utils/storage.js';
+import { ThemeContext } from './ThemeContext.js';
 
-const ThemeContext = createContext(null);
 const THEME_KEY = 'sneakertown_theme';
 
 export const ThemeProvider = ({ children }) => {
@@ -22,5 +22,3 @@ export const ThemeProvider = ({ children }) => {
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };
-
-export const useTheme = () => useContext(ThemeContext);

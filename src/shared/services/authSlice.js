@@ -1,15 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import {
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signOut,
-  updateProfile,
-} from 'firebase/auth';
-import { auth, googleProvider, isFirebaseEnabled, mapFirebaseError } from './firebase.js';
-import { userDataService } from './userDataService.js';
-import { mapFirebaseUser, mergeAuthUser } from '../../entities/user/model.js';
+import { mapApiUser, mergeAuthUser } from '../../entities/user/model.js';
+import { authApi, getApiErrorMessage } from './api.js';
 
 const AUTH_RATE_LIMIT_WINDOW = 2000;
 const authThrottle = new Map();
@@ -17,89 +8,65 @@ const authThrottle = new Map();
 const checkThrottle = (key) => {
   const now = Date.now();
   const last = authThrottle.get(key) || 0;
-  if (now - last < AUTH_RATE_LIMIT_WINDOW) {
-    throw new Error('auth/too-many-requests');
-  }
+  if (now - last < AUTH_RATE_LIMIT_WINDOW) throw new Error('Слишком много попыток. Попробуйте позже');
   authThrottle.set(key, now);
-  if (authThrottle.size > 100) {
-    for (const [k, t] of authThrottle) {
-      if (now - t > AUTH_RATE_LIMIT_WINDOW * 2) authThrottle.delete(k);
-    }
-  }
 };
 
-const requireFirebase = () => {
-  if (!isFirebaseEnabled) {
-    throw new Error('Firebase не настроен. Заполните переменные VITE_FIREBASE_* в .env');
-  }
-};
-
-export const registerUser = createAsyncThunk('auth/registerUser', async ({ email, password, displayName }, { rejectWithValue }) => {
+export const restoreSession = createAsyncThunk('auth/restoreSession', async (_, { rejectWithValue }) => {
   try {
-    requireFirebase();
-    checkThrottle('register');
-    const { user } = await createUserWithEmailAndPassword(auth, email, password);
-    const name = displayName?.trim() || '';
-
-    if (name) {
-      await updateProfile(user, { displayName: name });
-    }
-
-    const currentUser = auth.currentUser ?? user;
-    const mappedUser = {
-      ...mapFirebaseUser(currentUser),
-      displayName: name || currentUser.displayName || '',
-    };
-
-    userDataService.upsertUser({ ...currentUser, displayName: mappedUser.displayName }).catch((err) => console.error('Failed to upsert user:', err));
-
-    return mappedUser;
-  } catch (error) {
-    return rejectWithValue(mapFirebaseError(error));
+    const session = await authApi.refresh();
+    return mapApiUser(session.user);
+  } catch {
+    return rejectWithValue(null);
   }
 });
 
-export const loginUser = createAsyncThunk('auth/loginUser', async ({ email, password }, { rejectWithValue }) => {
+export const registerUser = createAsyncThunk('auth/registerUser', async (payload, { rejectWithValue }) => {
   try {
-    requireFirebase();
-    checkThrottle('login');
-    const { user } = await signInWithEmailAndPassword(auth, email, password);
-    userDataService.upsertUser(user).catch((err) => console.error('Failed to upsert user:', err));
-    return mapFirebaseUser(user);
+    checkThrottle('register');
+    const session = await authApi.register(payload);
+    return mapApiUser(session.user);
   } catch (error) {
-    return rejectWithValue(mapFirebaseError(error));
+    return rejectWithValue(getApiErrorMessage(error, error.message));
+  }
+});
+
+export const loginUser = createAsyncThunk('auth/loginUser', async (payload, { rejectWithValue }) => {
+  try {
+    checkThrottle('login');
+    const session = await authApi.login(payload);
+    return mapApiUser(session.user);
+  } catch (error) {
+    return rejectWithValue(getApiErrorMessage(error, error.message));
   }
 });
 
 export const loginWithGoogle = createAsyncThunk('auth/loginWithGoogle', async (_, { rejectWithValue }) => {
   try {
-    requireFirebase();
     checkThrottle('google');
-    const { user } = await signInWithPopup(auth, googleProvider);
-    userDataService.upsertUser(user).catch((err) => console.error('Failed to upsert user:', err));
-    return mapFirebaseUser(user);
+    window.location.assign(authApi.getGoogleLoginUrl());
+    return null;
   } catch (error) {
-    return rejectWithValue(mapFirebaseError(error));
+    return rejectWithValue(getApiErrorMessage(error, error.message));
   }
 });
 
-export const logoutUser = createAsyncThunk('auth/logoutUser', async (_, { rejectWithValue }) => {
+export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
   try {
-    requireFirebase();
-    await signOut(auth);
-  } catch (error) {
-    return rejectWithValue(mapFirebaseError(error));
+    await authApi.logout();
+  } catch {
+    // Локальный выход должен сработать, даже если API временно недоступен.
   }
+  return null;
 });
 
 export const resetPassword = createAsyncThunk('auth/resetPassword', async (email, { rejectWithValue }) => {
   try {
-    requireFirebase();
     checkThrottle('reset');
-    await sendPasswordResetEmail(auth, email);
+    await authApi.forgotPassword(email);
     return true;
   } catch (error) {
-    return rejectWithValue(mapFirebaseError(error));
+    return rejectWithValue(getApiErrorMessage(error));
   }
 });
 
@@ -124,30 +91,56 @@ const authSlice = createSlice({
     clearAuthError(state) {
       state.error = null;
     },
+    setAuthError(state, action) {
+      state.error = action.payload;
+      state.loading = false;
+    },
   },
   extraReducers: (builder) => {
     builder
-      .addMatcher((action) => action.type.startsWith('auth/') && action.type.endsWith('/pending'), (state) => {
-        state.loading = true;
-        state.error = null;
+      .addCase(restoreSession.pending, (state) => {
+        state.authReady = false;
       })
-      .addMatcher((action) => action.type.startsWith('auth/') && action.type.endsWith('/fulfilled'), (state, action) => {
-        state.loading = false;
-        if (action.payload && action.type !== 'auth/resetPassword/fulfilled') {
-          state.user = mergeAuthUser(state.user, action.payload);
-          state.isAuthenticated = true;
-        }
-        if (action.type === 'auth/logoutUser/fulfilled') {
-          state.user = null;
-          state.isAuthenticated = false;
-        }
+      .addCase(restoreSession.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.isAuthenticated = Boolean(action.payload);
+        state.authReady = true;
       })
-      .addMatcher((action) => action.type.startsWith('auth/') && action.type.endsWith('/rejected'), (state, action) => {
-        state.loading = false;
-        state.error = action.payload || 'Ошибка авторизации';
-      });
+      .addCase(restoreSession.rejected, (state) => {
+        state.user = null;
+        state.isAuthenticated = false;
+        state.authReady = true;
+      })
+      .addMatcher(
+        (action) => action.type.startsWith('auth/') && action.type.endsWith('/pending') && action.type !== restoreSession.pending.type,
+        (state) => {
+          state.loading = true;
+          state.error = null;
+        },
+      )
+      .addMatcher(
+        (action) => action.type.startsWith('auth/') && action.type.endsWith('/fulfilled') && action.type !== restoreSession.fulfilled.type,
+        (state, action) => {
+          state.loading = false;
+          if (action.payload && action.type !== resetPassword.fulfilled.type) {
+            state.user = mergeAuthUser(state.user, action.payload);
+            state.isAuthenticated = true;
+          }
+          if (action.type === logoutUser.fulfilled.type) {
+            state.user = null;
+            state.isAuthenticated = false;
+          }
+        },
+      )
+      .addMatcher(
+        (action) => action.type.startsWith('auth/') && action.type.endsWith('/rejected') && action.type !== restoreSession.rejected.type,
+        (state, action) => {
+          state.loading = false;
+          state.error = action.payload || 'Ошибка авторизации';
+        },
+      );
   },
 });
 
-export const { setUser, setAuthReady, clearAuthError } = authSlice.actions;
+export const { setUser, setAuthReady, clearAuthError, setAuthError } = authSlice.actions;
 export default authSlice.reducer;

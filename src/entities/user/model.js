@@ -1,11 +1,19 @@
-export const mapFirebaseUser = (user) =>
+const apiBaseUrl = import.meta.env.VITE_API_URL || '/api';
+
+const resolvePhotoUrl = (photoUrl) => {
+  if (!photoUrl || !photoUrl.startsWith('/') || !/^https?:\/\//.test(apiBaseUrl)) return photoUrl || '';
+  return new URL(photoUrl, apiBaseUrl).toString();
+};
+
+export const mapApiUser = (user) =>
   user
     ? {
         uid: user.uid,
-        email: user.email,
+        email: user.email || '',
         displayName: user.displayName || '',
-        photoURL: user.photoURL || '',
-        createdAt: user.metadata?.creationTime || '',
+        photoURL: resolvePhotoUrl(user.photoURL),
+        role: user.role || 'user',
+        createdAt: user.createdAt || '',
       }
     : null;
 

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FiHeart, FiMenu, FiMoon, FiSearch, FiShoppingBag, FiSun, FiUser, FiX } from 'react-icons/fi';
 import { SearchBar } from '../../features/search/SearchBar.jsx';
 import { setSearch } from '../../features/sneakers/sneakersSlice.js';
-import { useTheme } from '../../app/providers/ThemeProvider.jsx';
+import { useTheme } from '../../app/providers/ThemeContext.js';
 
 const navItems = [
   { to: '/', label: 'Главная' },

@@ -1,59 +1,35 @@
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { db, isFirebaseEnabled, storage } from './firebase.js';
+import { api, getApiErrorMessage } from './api.js';
+import { mapApiUser } from '../../entities/user/model.js';
 
 export const userDataService = {
-  async upsertUser(user) {
-    if (!isFirebaseEnabled || !user) return;
-    const payload = {
-      uid: user.uid,
-      email: user.email,
-      createdAt: user.metadata?.creationTime || serverTimestamp(),
-    };
-    if (user.displayName) payload.displayName = user.displayName;
-    if (user.photoURL) payload.photoURL = user.photoURL;
-    await setDoc(doc(db, 'users', user.uid), payload, { merge: true });
+  async getUserProfile() {
+    const { data } = await api.get('/users/me');
+    return mapApiUser(data);
   },
-  async getUserProfile(uid) {
-    if (!isFirebaseEnabled || !uid) return null;
-    const snap = await getDoc(doc(db, 'users', uid));
-    return snap.exists() ? snap.data() : null;
+  async updateProfile(displayName) {
+    const { data } = await api.patch('/users/me', { display_name: displayName });
+    return mapApiUser(data);
   },
-  async getUserCollection(collectionName, uid) {
-    if (!isFirebaseEnabled || !uid) return [];
-    const snap = await getDoc(doc(db, collectionName, uid));
-    return snap.exists() ? snap.data().items || [] : [];
+  async getUserCollection(collectionName) {
+    const { data } = await api.get(`/collections/${collectionName}`);
+    return data.items || [];
   },
-  async saveUserCollection(collectionName, uid, items) {
-    if (!isFirebaseEnabled || !uid) return;
-    await setDoc(
-      doc(db, collectionName, uid),
-      {
-        userId: uid,
-        items,
-        updatedAt: serverTimestamp(),
-      },
-      { merge: true },
-    );
+  async saveUserCollection(collectionName, _uid, items) {
+    const { data } = await api.put(`/collections/${collectionName}`, { items });
+    return data.items || [];
   },
-  ALLOWED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif'],
-  MAX_AVATAR_SIZE: 5 * 1024 * 1024,
-
-  async uploadAvatar(uid, file) {
-    if (!isFirebaseEnabled || !uid || !file) return '';
-
-    if (!this.ALLOWED_IMAGE_TYPES.includes(file.type)) {
-      throw new Error('Допустимы только изображения: JPG, PNG, GIF, WebP, AVIF');
+  async createOrder(_uid, payload) {
+    const { data } = await api.post('/orders', payload);
+    return data;
+  },
+  async uploadAvatar(_uid, file) {
+    const body = new FormData();
+    body.append('avatar', file);
+    try {
+      const { data } = await api.post('/users/me/avatar', body);
+      return mapApiUser(data);
+    } catch (error) {
+      throw new Error(getApiErrorMessage(error, 'Ошибка при загрузке фото'));
     }
-
-    if (file.size > this.MAX_AVATAR_SIZE) {
-      throw new Error('Размер файла не должен превышать 5 МБ');
-    }
-
-    const ext = file.name.split('.').pop().toLowerCase();
-    const safeName = `${uid}_${Date.now()}.${ext}`;
-    const avatarRef = ref(storage, `avatars/${uid}/${safeName}`);
-    await uploadBytes(avatarRef, file);
-    return getDownloadURL(avatarRef);
   },
 };

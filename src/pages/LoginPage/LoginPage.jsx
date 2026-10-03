@@ -1,19 +1,27 @@
-import { useState } from 'react';
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiMail } from 'react-icons/fi';
 import { PageLayout } from '../layout/PageLayout.jsx';
-import { loginUser, loginWithGoogle, resetPassword } from '../../shared/services/authSlice.js';
-import { useToast } from '../../app/providers/ToastProvider.jsx';
+import { loginUser, loginWithGoogle, resetPassword, setAuthError } from '../../shared/services/authSlice.js';
+import { useToast } from '../../app/providers/ToastContext.js';
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { showToast } = useToast();
   const { loading, error, user, authReady } = useSelector((state) => state.auth);
   const from = location.state?.from || '/profile';
+  const authError = searchParams.get('auth_error');
+
+  useEffect(() => {
+    if (authError === 'google-not-configured') {
+      dispatch(setAuthError('Вход через Google пока не настроен'));
+    }
+  }, [authError, dispatch]);
 
   if (authReady && user) return <Navigate to={from} replace />;
 
@@ -46,7 +54,7 @@ export default function LoginPage() {
               disabled={loading}
               onClick={async () => {
                 const result = await dispatch(loginWithGoogle());
-                if (loginWithGoogle.fulfilled.match(result)) navigate(from, { replace: true });
+                if (loginWithGoogle.fulfilled.match(result) && result.payload) navigate(from, { replace: true });
               }}
             >
               <FiMail /> Войти через Google

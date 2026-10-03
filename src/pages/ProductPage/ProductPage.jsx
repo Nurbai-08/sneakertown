@@ -8,7 +8,7 @@ import { addToCart } from '../../features/cart/cartSlice.js';
 import { addFavorite, removeFavorite } from '../../features/favorites/favoritesSlice.js';
 import { PageLoader } from '../../shared/ui/PageLoader.jsx';
 import { formatPrice } from '../../shared/utils/formatters.js';
-import { useToast } from '../../app/providers/ToastProvider.jsx';
+import { useToast } from '../../app/providers/ToastContext.js';
 
 export default function ProductPage() {
   const { id } = useParams();

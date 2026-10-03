@@ -1,15 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { FiLogOut, FiUpload } from "react-icons/fi";
-import { updateProfile } from "firebase/auth";
 import { PageLayout } from "../layout/PageLayout.jsx";
 import { PageLoader } from "../../shared/ui/PageLoader.jsx";
 import { logoutUser, setUser } from "../../shared/services/authSlice.js";
-import { auth } from "../../shared/services/firebase.js";
 import { userDataService } from "../../shared/services/userDataService.js";
-import { mapFirebaseUser } from "../../entities/user/model.js";
-import { useToast } from "../../app/providers/ToastProvider.jsx";
+import { useToast } from "../../app/providers/ToastContext.js";
 import { formatDate } from "../../shared/utils/formatters.js";
 
 export default function ProfilePage() {
@@ -17,16 +14,13 @@ export default function ProfilePage() {
   const { showToast } = useToast();
   const { user, authReady } = useSelector((state) => state.auth);
   const [displayName, setDisplayName] = useState(user?.displayName || "");
+  const [savingName, setSavingName] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const avatarInputRef = useRef(null);
 
   useEffect(() => {
     setDisplayName(user?.displayName || "");
   }, [user?.displayName]);
-
-  useEffect(() => {
-    if (!user && auth?.currentUser) {
-      dispatch(setUser(mapFirebaseUser(auth.currentUser)));
-    }
-  }, [user, dispatch]);
 
   if (!authReady) {
     return (
@@ -37,42 +31,44 @@ export default function ProfilePage() {
   }
 
   if (!user) {
-    if (auth?.currentUser) {
-      return (
-        <PageLayout>
-          <PageLoader />
-        </PageLayout>
-      );
-    }
     return <Navigate to="/login" replace />;
   }
 
   const saveName = async () => {
-    if (!auth?.currentUser) {
-      showToast("Пользователь не авторизован");
-      return;
-    }
-
-    if (!displayName.trim()) {
+    const nextName = displayName.trim();
+    if (!nextName) {
       showToast("Введите имя");
       return;
     }
+
     try {
-      await updateProfile(auth.currentUser, {
-        displayName: displayName.trim(),
-      });
-
-      await auth.currentUser.reload();
-
-      const updatedUser = auth.currentUser;
-
-      await userDataService.upsertUser(updatedUser);
-
-      dispatch(setUser(mapFirebaseUser(updatedUser)));
+      setSavingName(true);
+      const updatedUser = await userDataService.updateProfile(nextName);
+      dispatch(setUser(updatedUser));
+      setDisplayName(nextName);
 
       showToast("Имя обновлено");
     } catch (error) {
       showToast(error.message || "Ошибка при обновлении имени");
+    } finally {
+      setSavingName(false);
+    }
+  };
+
+  const uploadAvatar = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    try {
+      setUploadingAvatar(true);
+      const updatedUser = await userDataService.uploadAvatar(user.uid, file);
+      dispatch(setUser(updatedUser));
+      showToast("Фото обновлено");
+    } catch (error) {
+      showToast(error.message || "Ошибка при загрузке фото");
+    } finally {
+      setUploadingAvatar(false);
     }
   };
 
@@ -93,8 +89,8 @@ export default function ProfilePage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
-          <aside className="rounded-md border border-neutral-200 pt-[5.25rem] text-center dark:border-neutral-800">
-            {user.photoURL?.startsWith('http') ? (
+          <aside className="rounded-md border border-neutral-200 px-6 pb-6 pt-[5.25rem] text-center dark:border-neutral-800">
+            {user.photoURL ? (
               <img className="mx-auto h-32 w-32 rounded-full bg-neutral-100 object-cover dark:bg-neutral-900" src={user.photoURL} alt={user.displayName || user.email} />
             ) : (
               <div className="mx-auto grid h-32 w-32 place-items-center rounded-full bg-gradient-to-br from-orange-400 to-orange-600 text-4xl font-black text-white">
@@ -105,6 +101,21 @@ export default function ProfilePage() {
               {user.displayName || "Покупатель"}
             </h2>
             <p className="mt-1 text-sm text-neutral-500">{user.email}</p>
+            <input
+              ref={avatarInputRef}
+              className="hidden"
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
+              onChange={uploadAvatar}
+            />
+            <button
+              className="btn-secondary mx-auto mt-4"
+              type="button"
+              disabled={uploadingAvatar}
+              onClick={() => avatarInputRef.current?.click()}
+            >
+              <FiUpload /> {uploadingAvatar ? "Загружаем..." : "Обновить фото"}
+            </button>
           </aside>
 
           <div className="rounded-md border border-neutral-200 p-6 dark:border-neutral-800">
@@ -139,9 +150,10 @@ export default function ProfilePage() {
                 <button
                   className="btn-primary"
                   type="button"
+                  disabled={savingName}
                   onClick={saveName}
                 >
-                  Сохранить
+                  {savingName ? "Сохраняем..." : "Сохранить"}
                 </button>
                 <button
                   className="btn-secondary"

@@ -1,12 +1,17 @@
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { FiSearch } from 'react-icons/fi';
 import { useDebounce } from '../../shared/hooks/useDebounce.js';
 
 export const SearchBar = memo(({ value = '', onChange, placeholder = 'Поиск кроссовок' }) => {
   const [query, setQuery] = useState(value);
   const debounced = useDebounce(query, 500);
+  const didMount = useRef(false);
 
   useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true;
+      return;
+    }
     onChange?.(debounced);
   }, [debounced, onChange]);
 

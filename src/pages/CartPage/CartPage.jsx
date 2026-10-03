@@ -1,29 +1,41 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiMinus, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { PageLayout } from '../layout/PageLayout.jsx';
 import { clearCart, decreaseQuantity, increaseQuantity, removeFromCart } from '../../features/cart/cartSlice.js';
 import { EmptyState } from '../../shared/ui/EmptyState.jsx';
 import { formatPrice } from '../../shared/utils/formatters.js';
-import { useToast } from '../../app/providers/ToastProvider.jsx';
+import { useToast } from '../../app/providers/ToastContext.js';
+import { userDataService } from '../../shared/services/userDataService.js';
 
 export default function CartPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
   const { items, totalItems, totalPrice } = useSelector((state) => state.cart);
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const user = useSelector((state) => state.auth.user);
+  const isAuthenticated = Boolean(user?.uid);
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!isAuthenticated) {
       showToast('Зарегистрируйтесь в аккаунт, чтобы оформить заказ');
       navigate('/login', { state: { from: '/cart' } });
       return;
     }
 
-    dispatch(clearCart());
-    showToast('Заказ успешно оформлен!');
-    navigate('/');
+    try {
+      setCheckoutLoading(true);
+      await userDataService.createOrder(user.uid, { items, totalItems, totalPrice });
+      dispatch(clearCart());
+      showToast('Заказ успешно оформлен!');
+      navigate('/profile');
+    } catch {
+      showToast('Не удалось оформить заказ. Попробуйте позже');
+    } finally {
+      setCheckoutLoading(false);
+    }
   };
  
 
@@ -67,7 +79,9 @@ export default function CartPage() {
               <h2 className="text-xl font-black">Итого</h2>
               <div className="mt-4 flex justify-between text-sm"><span>Товары</span><b>{totalItems}</b></div>
               <div className="mt-3 flex justify-between text-lg"><span>Сумма</span><b>{formatPrice(totalPrice)}</b></div>
-              <button className="btn-primary mt-6 w-full" type="button" onClick={handleCheckout}>Оформить заказ</button>
+              <button className="btn-primary mt-6 w-full" type="button" disabled={checkoutLoading} onClick={handleCheckout}>
+                {checkoutLoading ? 'Оформляем...' : 'Оформить заказ'}
+              </button>
             </aside>
           </div>
         )}

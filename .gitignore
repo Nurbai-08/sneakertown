@@ -12,6 +12,16 @@ dist
 dist-ssr
 *.local
 .env
+backend/.env
+backend/.venv/
+backend/.npm-cache/
+backend/uploads/*
+!backend/uploads/.gitkeep
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+backend/*.db
 # src/firebase/firebaseConfig.js
 
 # Editor directories and files

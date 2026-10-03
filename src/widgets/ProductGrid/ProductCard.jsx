@@ -5,7 +5,7 @@ import { FiHeart, FiShoppingBag } from 'react-icons/fi';
 import { addToCart } from '../../features/cart/cartSlice.js';
 import { addFavorite, removeFavorite } from '../../features/favorites/favoritesSlice.js';
 import { formatPrice } from '../../shared/utils/formatters.js';
-import { useToast } from '../../app/providers/ToastProvider.jsx';
+import { useToast } from '../../app/providers/ToastContext.js';
 
 export const ProductCard = memo(({ sneaker, index = 0 }) => {
   const dispatch = useDispatch();
